@@ -3,12 +3,19 @@
 
 // Define motor pins (as before)
 #define speedPinR 9
-#define RightDirectPin1 12
-#define RightDirectPin2 11
+#define RightDirectPin1 A0
+#define RightDirectPin2 A1
 #define speedPinL 6
-#define LeftDirectPin1 7
-#define LeftDirectPin2 8
+#define LeftDirectPin1 A2
+#define LeftDirectPin2 A3
 #define LPT 0
+
+void pin_setup(){
+  pinMode(A0,OUTPUT);
+  pinMode(A1,OUTPUT);
+  pinMode(A2,OUTPUT);
+  pinMode(A3,OUTPUT);
+}
 
 // Define obstacle sensor pins (as before)
 #define RightObstacleSensor 2
@@ -25,7 +32,7 @@
 #define BACK_SPEED2 80
 
 // HuskyLens setup
-SoftwareSerial mySerial(0, 1); // RX, TX
+SoftwareSerial mySerial(11, 12); // RX, TX
 HUSKYLENS huskylens;
 
 // Variables
