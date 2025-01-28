@@ -1,10 +1,17 @@
-#define speedPinR 9   // RIGHT PWM pin connect MODEL-X ENA
-#define RightDirectPin1  12    //  Right Motor direction pin 1 to MODEL-X IN1
-#define RightDirectPin2  11    // Right Motor direction pin 2 to MODEL-X IN2
-#define speedPinL 6        //  Left PWM pin connect MODEL-X ENB
-#define LeftDirectPin1  7    // Left Motor direction pin 1 to MODEL-X IN3
-#define LeftDirectPin2  8   ///Left Motor direction pin 1 to MODEL-X IN4
+#define speedPinR 9       // RIGHT PWM pin connect MODEL-X ENA
+#define RightDirectPin1  A0    //  Right Motor direction pin 1 to MODEL-X IN1
+#define RightDirectPin2  A1    // Right Motor direction pin 2 to MODEL-X IN2
+#define speedPinL 6          //  Left PWM pin connect MODEL-X ENB
+#define LeftDirectPin1  A2    // Left Motor direction pin 1 to MODEL-X IN3
+#define LeftDirectPin2  A3   ///Left Motor direction pin 1 to MODEL-X IN4
 #define LPT 2
+
+void pin_setup(){
+  pinMode(A0,OUTPUT);
+  pinMode(A1,OUTPUT);
+  pinMode(A2,OUTPUT);
+  pinMode(A3,OUTPUT);
+}
 
 /*From left to right, connect to D3,A1-A3 ,D10*/
 #define RightObstacleSensor 2  //Right obstacle sensor to D2 (front direction is from arduino point to voltage meter)
