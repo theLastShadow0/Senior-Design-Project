@@ -1,17 +1,26 @@
-#define speedPinR 9       // RIGHT PWM pin connect MODEL-X ENA
+
+
+/*  ___   ___  ___  _   _  ___   ___   ____ ___  ____  
+ * / _ \ /___)/ _ \| | | |/ _ \ / _ \ / ___) _ \|    \
+ *| |_| |___ | |_| | |_| | |_| | |_| ( (__| |_| | | | |
+ * \___/(___/ \___/ \__  |\___/ \___(_)____)___/|_|_|_|
+ *                  (____/
+ * V2 Arduino Smart Car Tutorial Lesson 3
+ * Tutorial URL http://osoyoo.com/2018/12/18/osoyoo-robot-car-kit-lesson-3-object-follow-robot-car/
+ * CopyRight www.osoyoo.com
+ *
+ */
+//Define L298N Dual H-Bridge Motor Controller Pins
+#define speedPinR 9   // RIGHT PWM pin connect MODEL-X ENA
 #define RightDirectPin1  A0    //  Right Motor direction pin 1 to MODEL-X IN1
 #define RightDirectPin2  A1    // Right Motor direction pin 2 to MODEL-X IN2
-#define speedPinL 6          //  Left PWM pin connect MODEL-X ENB
+#define speedPinL 6        //  Left PWM pin connect MODEL-X ENB
 #define LeftDirectPin1  A2    // Left Motor direction pin 1 to MODEL-X IN3
 #define LeftDirectPin2  A3   ///Left Motor direction pin 1 to MODEL-X IN4
-#define LPT 2
+#define LPT 0
 
-void pin_setup(){
-  pinMode(A0,OUTPUT);
-  pinMode(A1,OUTPUT);
-  pinMode(A2,OUTPUT);
-  pinMode(A3,OUTPUT);
-}
+
+
 
 /*From left to right, connect to D3,A1-A3 ,D10*/
 #define RightObstacleSensor 2  //Right obstacle sensor to D2 (front direction is from arduino point to voltage meter)
@@ -25,8 +34,8 @@ void pin_setup(){
 #define FAST_SPEED 150
 #define SPEED   100 //motor in   speed
 #define TURN_SPEED 80
-#define BACK_SPEED1 50
-#define BACK_SPEED2 80
+#define BACK_SPEED1 30
+#define BACK_SPEED2 50
 
 
 int leftscanval, centerscanval, rightscanval, ldiagonalscanval, rdiagonalscanval;
@@ -62,32 +71,11 @@ void go_Right()  //Turn right
 }
 void go_Back()  //Reverse
 {
-  int IRvalueLeft= digitalRead(RightObstacleSensor);
-  int IRvalueRight=digitalRead(LeftObstacleSensor);
- if (IRvalueLeft==LOW || IRvalueRight==LOW)
- {
-  stop_Stop();
-    set_Motorspeed(0,0);
- }
-else if (IRvalueLeft==LOW || IRvalueRight==HIGH)
- {
-  stop_Stop();
-    set_Motorspeed(0,0);
- }
-  else if (IRvalueLeft==HIGH || IRvalueRight==LOW)
- {
-    stop_Stop();
-      set_Motorspeed(0,0);
- }
- else  if (IRvalueLeft==HIGH || IRvalueRight==HIGH)
- {
   digitalWrite(RightDirectPin1, LOW);
   digitalWrite(RightDirectPin2,HIGH);
   digitalWrite(LeftDirectPin1,LOW);
   digitalWrite(LeftDirectPin2,HIGH);
-  }
-
-
+  set_Motorspeed(BACK_SPEED1,BACK_SPEED1);
 }
 void stop_Stop()    //Stop
 {
@@ -102,6 +90,43 @@ void set_Motorspeed(int speed_L,int speed_R)
 {
   analogWrite(speedPinL,speed_L);
   analogWrite(speedPinR,speed_R);  
+}
+
+void autostopping()
+{
+  int IRvalueLeft= digitalRead(RightObstacleSensor);
+  int IRvalueRight=digitalRead(LeftObstacleSensor);
+ if (IRvalueLeft==LOW && IRvalueRight==LOW)
+ { 
+  stop_Stop();   //obstacle, stop
+     set_Motorspeed(0,0);
+     delay(500);
+     go_Right();
+     
+ }
+ else  if (IRvalueLeft==HIGH && IRvalueRight==HIGH)
+ {
+//both sensor detected obstacle, go ahead
+      go_Back();
+      
+    }
+ else if (IRvalueLeft==LOW && IRvalueRight==HIGH)
+ { 
+  stop_Stop();   //obstacle, stop
+     set_Motorspeed(0,0);
+     delay(500);
+     go_Right();
+     
+ }
+  else if (IRvalueLeft==HIGH && IRvalueRight==LOW)
+ { 
+   stop_Stop();   //obstacle, stop
+     set_Motorspeed(0,0);
+     delay(500);
+     go_Right();
+     
+ }
+ 
 }
 
 
@@ -272,8 +297,8 @@ void auto_avoidance(){
   distance = watch(); // use the watch() function to see if anything is ahead (when the robot is just moving forward and not looking around it will test the distance in front)
   if (distance<distancelimit){ // The robot will just stop if it is completely sure there's an obstacle ahead (must test 25 times) (needed to ignore ultrasonic sensor's false signals)
  Serial.println("final go back");
-    go_Right();
-    set_Motorspeed( SPEED,FAST_SPEED);
+    autostopping();
+    set_Motorspeed( SPEED,SPEED);
   delay(backtime*3/2);
       ++thereis;}
   if (distance>distancelimit){
@@ -300,6 +325,10 @@ void setup()
   pinMode(LeftObstacleSensor,INPUT);
  Serial.begin(9600);
 
+  pinMode (A0, OUTPUT);
+  pinMode (A1, OUTPUT);
+  pinMode (A2, OUTPUT);
+  pinMode (A3, OUTPUT);
 
   pinMode(Trig_PIN_1, OUTPUT); // Set Trig_PIN_1 as OUTPUT
   pinMode(Trig_PIN_2, OUTPUT); // Set Trig_PIN_2 as OUTPUT
@@ -309,41 +338,8 @@ void setup()
 
   digitalWrite(Trig_PIN_1, LOW); // Set initial state of Trig_PIN_1 to LOW
   digitalWrite(Trig_PIN_2, LOW); // Set initial state of Trig_PIN_2 to LOW
-
-
-
-
 }
-void autostopping()
-{
-  int IRvalueLeft= digitalRead(RightObstacleSensor);
-  int IRvalueRight=digitalRead(LeftObstacleSensor);
- if (IRvalueLeft==LOW || IRvalueRight==LOW)
- {
-  stop_Stop();
-    set_Motorspeed(0,0);
- }
-else if (IRvalueLeft==LOW || IRvalueRight==HIGH)
- {
-  stop_Stop();
-    set_Motorspeed(0,0);
- }
-  else if (IRvalueLeft==HIGH || IRvalueRight==LOW)
- {
-    stop_Stop();
-      set_Motorspeed(0,0);
- }
- else  if (IRvalueLeft==HIGH || IRvalueRight==HIGH)
- {
-  go_Back();  
-  }
-}
-
 
 void loop(){
 auto_avoidance();
-autostopping();
 }
-
-
-
