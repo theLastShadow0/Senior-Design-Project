@@ -1,0 +1,125 @@
+#define speedPinR 9   // RIGHT PWM pin connect MODEL-X ENA
+#define RightDirectPin1  A0    //  Right Motor direction pin 1 to MODEL-X IN1
+#define RightDirectPin2  A1    // Right Motor direction pin 2 to MODEL-X IN2
+#define speedPinL 6        //  Left PWM pin connect MODEL-X ENB
+#define LeftDirectPin1  A2    // Left Motor direction pin 1 to MODEL-X IN3
+#define LeftDirectPin2  A3   ///Left Motor direction pin 1 to MODEL-X IN4
+#define LPT 0
+
+
+#define FAST_SPEED 150
+#define SPEED   100 
+#define TURN_SPEED1 200
+#define TURN_SPEED2 50
+
+#define BACK_SPEED1 100
+#define BACK_SPEED2 100
+
+void go_Advance(void)  
+{
+  digitalWrite(RightDirectPin1, HIGH);
+  digitalWrite(RightDirectPin2,LOW);
+  digitalWrite(LeftDirectPin1,HIGH);
+  digitalWrite(LeftDirectPin2,LOW);
+}
+
+void go_Left()  
+{
+  digitalWrite(RightDirectPin1, HIGH);
+  digitalWrite(RightDirectPin2,LOW);
+  digitalWrite(LeftDirectPin1,LOW);
+  digitalWrite(LeftDirectPin2,HIGH);
+}
+
+void go_Right() 
+{
+  digitalWrite(RightDirectPin1, LOW);
+  digitalWrite(RightDirectPin2,HIGH);
+  digitalWrite(LeftDirectPin1,HIGH);
+  digitalWrite(LeftDirectPin2,LOW);
+}
+
+void go_Back()  
+{
+  digitalWrite(RightDirectPin1, LOW);
+  digitalWrite(RightDirectPin2,HIGH);
+  digitalWrite(LeftDirectPin1,LOW);
+  digitalWrite(LeftDirectPin2,HIGH);
+}
+
+void stop_Stop()  
+{
+  digitalWrite(RightDirectPin1, LOW);
+  digitalWrite(RightDirectPin2,LOW);
+  digitalWrite(LeftDirectPin1,LOW);
+  digitalWrite(LeftDirectPin2,LOW);
+  set_Motorspeed(0,0);
+}
+/*set motor speed */
+void set_Motorspeed(int speed_L,int speed_R)
+{
+  analogWrite(speedPinL,speed_L);
+  analogWrite(speedPinR,speed_R);  
+}
+
+void setup()
+{
+ pinMode(speedPinL,OUTPUT); //left motor PWM pin
+ pinMode(speedPinR,OUTPUT); //rignt motor PWM  pin
+ pinMode(RightDirectPin1,OUTPUT); //left motor direction pin1
+ pinMode(RightDirectPin2,OUTPUT); //left motor direction pin2
+ pinMode(LeftDirectPin1,OUTPUT); //right motor direction Pin 1
+ pinMode(LeftDirectPin2,OUTPUT);  //right motor direction Pin 2
+ stop_Stop();
+  /*line follow sensors */
+ //pinMode(RightObstacleSensor,INPUT);
+  //pinMode(LeftObstacleSensor,INPUT);
+ //Serial.begin(9600);
+
+  pinMode (A0, OUTPUT);
+  pinMode (A1, OUTPUT);
+  pinMode (A2, OUTPUT);
+  pinMode (A3, OUTPUT);
+
+  //pinMode(Trig_PIN_1, OUTPUT); // Set Trig_PIN_1 as OUTPUT
+  //pinMode(Trig_PIN_2, OUTPUT); // Set Trig_PIN_2 as OUTPUT
+  //pinMode(Echo_PIN_1, INPUT);  // Set Echo_PIN_1 as INPUT
+  //pinMode(Echo_PIN_2, INPUT);  // Set Echo_PIN_2 as INPUT
+
+
+  //digitalWrite(Trig_PIN_1, LOW); // Set initial state of Trig_PIN_1 to LOW
+  //digitalWrite(Trig_PIN_2, LOW); // Set initial state of Trig_PIN_2 to LOW
+}
+
+void test(){
+  go_Advance();//Forward
+  set_Motorspeed(SPEED,SPEED);
+  delay(2000);
+  stop_Stop();
+  delay(2000);
+  
+  go_Back();//Reverse
+  set_Motorspeed(BACK_SPEED1,BACK_SPEED2);
+  delay(2000);
+  stop_Stop();
+  delay(2000);
+  
+  go_Left();//Turn left
+  set_Motorspeed(TURN_SPEED2,TURN_SPEED1);
+  delay(2000);
+  stop_Stop();
+  delay(2000);
+  
+  go_Right();//Turn right
+  set_Motorspeed(TURN_SPEED1,TURN_SPEED2);
+  delay(2000);
+  stop_Stop();
+  
+  
+  stop_Stop();//Stop
+  delay(2000);
+}
+
+void loop(){
+  test();
+}
