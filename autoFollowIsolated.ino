@@ -11,7 +11,9 @@
 
 #define FAST_SPEED 150
 #define SPEED   100 //motor in   speed
-#define TURN_SPEED 80
+#define TURN_SPEED1 143
+#define TURN_SPEED2 53
+#define TURN_SPEED3 150
 #define BACK_SPEED1 50
 #define BACK_SPEED2 80
 
@@ -94,28 +96,28 @@ void go_Advance() {
   digitalWrite(RightDirectPin2,LOW);
   digitalWrite(LeftDirectPin1,HIGH);
   digitalWrite(LeftDirectPin2,LOW);
-  set_Motorspeed(100,100);
+  //set_Motorspeed(100,100);
    }
 void go_Left() { 
-  digitalWrite(RightDirectPin1, HIGH);
-  digitalWrite(RightDirectPin2,LOW);
+  //digitalWrite(RightDirectPin1, HIGH);
+  //digitalWrite(RightDirectPin2,LOW);
   digitalWrite(LeftDirectPin1,LOW);
   digitalWrite(LeftDirectPin2,HIGH);
-  set_Motorspeed(100,100);
+  //set_Motorspeed(TURN_SPEED2,TURN_SPEED1);
  }
 void go_Right() {   
-  digitalWrite(RightDirectPin1, LOW);
+  digitalWrite(RightDirectPin1,LOW);
   digitalWrite(RightDirectPin2,HIGH);
-  digitalWrite(LeftDirectPin1,HIGH);
-  digitalWrite(LeftDirectPin2,LOW);
-  set_Motorspeed(100,100);
+  //digitalWrite(LeftDirectPin1,HIGH);
+  //digitalWrite(LeftDirectPin2,LOW);
+  //set_Motorspeed(TURN_SPEED1,TURN_SPEED2);
    }
 void go_Back() {   
   digitalWrite(RightDirectPin1, LOW);
   digitalWrite(RightDirectPin2,HIGH);
   digitalWrite(LeftDirectPin1,LOW);
   digitalWrite(LeftDirectPin2,HIGH);
-  set_Motorspeed(100,100);
+  //set_Motorspeed(100,100);
   }
 void stop_Stop() { 
   digitalWrite(RightDirectPin1, LOW);
@@ -137,11 +139,13 @@ void driveBot(HUSKYLENSResult result)
   if(result.xCenter<=120)
   {
     go_Left();
+    set_Motorspeed(TURN_SPEED3,TURN_SPEED2);
   }
 
   else if(result.xCenter>=180)
   {
     go_Right();
+    set_Motorspeed(TURN_SPEED2,TURN_SPEED1);
   }
 
     else if((result.xCenter>=120)&&(result.xCenter<=180))
