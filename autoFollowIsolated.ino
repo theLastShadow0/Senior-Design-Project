@@ -9,11 +9,15 @@
 #define LeftDirectPin2 A3
 #define LPT 0
 
-#define FAST_SPEED 150
-#define SPEED   100 //motor in   speed
+#define FAST_SPEED 200 //150
+#define SPEED   150 //100
+#define SLOW_SPEED1 100
+#define SLOW_SPEED2 90
+
 #define TURN_SPEED1 143
 #define TURN_SPEED2 53
 #define TURN_SPEED3 150
+
 #define BACK_SPEED1 50
 #define BACK_SPEED2 80
 
@@ -136,31 +140,29 @@ void stop_Stop() {
 
 void driveBot(HUSKYLENSResult result)
 {
-  if(result.xCenter<=120)
+
+if(result.xCenter<=120)
   {
     go_Left();
     set_Motorspeed(TURN_SPEED3,TURN_SPEED2);
   }
 
-  else if(result.xCenter>=180)
+else if(result.xCenter>=180)
   {
     go_Right();
     set_Motorspeed(TURN_SPEED2,TURN_SPEED1);
   }
-
-    else if((result.xCenter>=120)&&(result.xCenter<=180))
-  {
-    if(result.width<20)
-    {
-      go_Advance();
-    }
-
-    else if(result.width>20)
-    {
-      stop_Stop();
-    }
-  }
-  
+else if(result.width < 35)  // Increase threshold to allow forward movement
+{
+  go_Advance();
+  set_Motorspeed(SPEED, FAST_SPEED);
 }
-
-
+else if (result.width >= 35 && result.width <= 50)  // Slow down instead of stopping
+{
+  go_Advance();
+  set_Motorspeed(SLOW_SPEED1, SLOW_SPEED2);
+}
+else if(result.width > 50)
+{
+  stop_Stop();
+}
