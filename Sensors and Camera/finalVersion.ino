@@ -17,16 +17,16 @@
 #define Echo_PIN_2 5   // Right ultrasonic sensor
 #define Trig_PIN_2 13  // Right ultrasonic sensor
 
-#define FAST_SPEED 200  //150
-#define SPEED 150       //100
-#define SLOW_SPEED1 100
-#define SLOW_SPEED2 90
+#define FAST_SPEED 200   //150
+#define SPEED 150        //100
+#define SLOW_SPEED1 100  //90
+#define SLOW_SPEED2 90   //80
 
-#define TURN_SPEED1 143
-#define TURN_SPEED2 53
-#define TURN_SPEED3 150
+#define TURN_SPEED1 133  //123
+#define TURN_SPEED2 63   //53
+#define TURN_SPEED3 140  //130
 
-#define BACK_SPEED1 50
+#define BACK_SPEED1 90
 #define BACK_SPEED2 80
 
 const int distancelimit = 30;
@@ -233,14 +233,35 @@ void driveBot(HUSKYLENSResult result) {
   }
 
   else {
-    if (result.width < 35) {  // Increase threshold to allow forward movement
-      Serial.println("GO FORWARD");
-      set_Motorspeed(SPEED, SPEED);
-      go_Advance();
-    } else if (result.width <= 50) {  // Slow down instead of stopping
-      Serial.println("SLOW DOWN");
-      set_Motorspeed(SLOW_SPEED1, SLOW_SPEED2);
-      go_Advance();
+    if (result.width < 45) {  // Increase threshold to allow forward movement
+      if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit) {
+        Serial.println("GO FORWARD");
+        set_Motorspeed(SPEED, SPEED);
+        go_Advance();
+      } if (echo_distance_1 < distancelimit) {
+        Serial.println("TURN RIGHT");
+        set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
+        go_Right();
+      } if (echo_distance_2 < distancelimit) {
+        Serial.println("TURN LEFT");
+        set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
+        go_Left();
+      }
+
+    } else if (result.width <= 60) {  // Slow down instead of stopping 50
+      if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit) {
+        Serial.println("SLOW DOWN");
+        set_Motorspeed(SLOW_SPEED1, SLOW_SPEED2);
+        go_Advance();
+      } if (echo_distance_1 < distancelimit) {
+        Serial.println("TURN RIGHT");
+        set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
+        go_Right();
+      } if (echo_distance_2 < distancelimit) {
+        Serial.println("TURN LEFT");
+        set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
+        go_Left();
+      }
     } else {
       Serial.println("STOP");
       stop_Stop();
