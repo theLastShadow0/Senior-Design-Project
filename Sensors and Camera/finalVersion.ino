@@ -19,8 +19,8 @@
 
 #define FAST_SPEED 200   //150
 #define SPEED 150        //100
-#define SLOW_SPEED1 100  //90
-#define SLOW_SPEED2 90   //80
+#define SLOW_SPEED1 90
+#define SLOW_SPEED2 80
 
 #define TURN_SPEED1 133  //123
 #define TURN_SPEED2 63   //53
@@ -127,6 +127,18 @@ void printResult(HUSKYLENSResult result) {
 }
 
 void go_Advance() {
+  Serial.println("GO FORWARD");
+  set_Motorspeed(SPEED, SPEED);
+  
+  digitalWrite(RightDirectPin1, HIGH);
+  digitalWrite(RightDirectPin2, LOW);
+  digitalWrite(LeftDirectPin1, HIGH);
+  digitalWrite(LeftDirectPin2, LOW);
+}
+void go_Slow() {
+  Serial.println("SLOW DOWN");
+  set_Motorspeed(SLOW_SPEED1, SLOW_SPEED2);
+  
   digitalWrite(RightDirectPin1, HIGH);
   digitalWrite(RightDirectPin2, LOW);
   digitalWrite(LeftDirectPin1, HIGH);
@@ -134,6 +146,9 @@ void go_Advance() {
 }
 
 void go_Left() {
+  Serial.println("TURN LEFT");
+  set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
+  
   // digitalWrite(RightDirectPin1, HIGH);
   // digitalWrite(RightDirectPin2,LOW);
   digitalWrite(LeftDirectPin1, LOW);
@@ -141,6 +156,9 @@ void go_Left() {
 }
 
 void go_Right() {
+  Serial.println("TURN RIGHT");
+  set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
+  
   digitalWrite(RightDirectPin1, LOW);
   digitalWrite(RightDirectPin2, HIGH);
   // digitalWrite(LeftDirectPin1,HIGH);
@@ -148,6 +166,9 @@ void go_Right() {
 }
 
 void go_Back() {
+  Serial.println("REVERSING");
+  set_Motorspeed(BACK_SPEED1, BACK_SPEED2);
+  
   digitalWrite(RightDirectPin1, LOW);
   digitalWrite(RightDirectPin2, HIGH);
   digitalWrite(LeftDirectPin1, LOW);
@@ -155,11 +176,13 @@ void go_Back() {
 }
 
 void stop_Stop() {
+  Serial.println("STOP");
+  set_Motorspeed(0, 0);
+  
   digitalWrite(RightDirectPin1, LOW);
   digitalWrite(RightDirectPin2, LOW);
   digitalWrite(LeftDirectPin1, LOW);
   digitalWrite(LeftDirectPin2, LOW);
-  set_Motorspeed(0, 0);
 }
 
 void set_Motorspeed(int speed_L, int speed_R) {
@@ -167,17 +190,15 @@ void set_Motorspeed(int speed_L, int speed_R) {
   analogWrite(speedPinR, speed_R);
 }
 
-void autostopping() {
+void auto_Stopping() {
   int IRvalueLeft = digitalRead(LeftObstacleSensor);
   int IRvalueRight = digitalRead(RightObstacleSensor);
 
   if (IRvalueLeft == LOW || IRvalueRight == LOW) {
-    Serial.println("Infrared Detected Object. STOPPING.");
-    set_Motorspeed(0, 0);
+    Serial.println("Infrared Detected Object.");
     stop_Stop();
-  } else {
-    Serial.println("REVERSING");
-    set_Motorspeed(BACK_SPEED1, BACK_SPEED2);
+  } 
+  else {
     go_Back();
   }
 }
@@ -210,64 +231,52 @@ void driveBot(HUSKYLENSResult result) {
 
   if (result.xCenter <= 120) {
     if (echo_distance_1 > distancelimit) {
-      Serial.println("TURN LEFT");
-      set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
       go_Left();
     } else {
-      Serial.println("TURN RIGHT");
-      set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
       go_Right();
     }
   }
-
   else if (result.xCenter >= 180) {
     if (echo_distance_2 > distancelimit) {
-      Serial.println("TURN RIGHT");
-      set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
       go_Right();
     } else {
-      Serial.println("TURN LEFT");
-      set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
       go_Left();
     }
   }
 
   else {
-    if (result.width < 45) {  // Increase threshold to allow forward movement
+    if (result.width < 45) {  //Tracked Object's block becomes smaller as it moves forward.
       if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit) {
-        Serial.println("GO FORWARD");
-        set_Motorspeed(SPEED, SPEED);
         go_Advance();
-      } if (echo_distance_1 < distancelimit) {
-        Serial.println("TURN RIGHT");
-        set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
+      }
+      else if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit){
+        auto_Stopping();
+      }
+      else if (echo_distance_1 < distancelimit) {
         go_Right();
-      } if (echo_distance_2 < distancelimit) {
-        Serial.println("TURN LEFT");
-        set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
+      } 
+      else if (echo_distance_2 < distancelimit) {
         go_Left();
       }
-
-    } else if (result.width <= 60) {  // Slow down instead of stopping 50
+    } 
+    else if (result.width <= 60) {  // Slow down instead of stopping 50
       if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit) {
-        Serial.println("SLOW DOWN");
-        set_Motorspeed(SLOW_SPEED1, SLOW_SPEED2);
-        go_Advance();
-      } if (echo_distance_1 < distancelimit) {
-        Serial.println("TURN RIGHT");
-        set_Motorspeed(TURN_SPEED2, TURN_SPEED1);
+        go_Slow();
+      }
+      else if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit){
+        auto_Stopping();
+      }
+      else if (echo_distance_1 < distancelimit) {
         go_Right();
-      } if (echo_distance_2 < distancelimit) {
-        Serial.println("TURN LEFT");
-        set_Motorspeed(TURN_SPEED3, TURN_SPEED2);
+      } 
+      else if (echo_distance_2 < distancelimit) {
         go_Left();
       }
-    } else {
-      Serial.println("STOP");
+    } 
+    else {
       stop_Stop();
       if (result.width > 100) {
-        Serial.println("GO BACK");
-        autostopping();
+        auto_Stopping();
       }
     }
   }
