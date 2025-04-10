@@ -331,14 +331,14 @@ void watch(int &echo_distance_1, int &echo_distance_2) {
 void driveBot(HUSKYLENSResult result) {
   int echo_distance_1, echo_distance_2;
   watch(echo_distance_1, echo_distance_2);
-
-  if (result.xCenter <= 120) {
+//120, 180
+  if (result.xCenter <= 100) {
     if (echo_distance_1 > distancelimit) {
       go_Left();
     } else {
       go_Right();
     }
-  } else if (result.xCenter >= 180) {
+  } else if (result.xCenter >= 240) {
     if (echo_distance_2 > distancelimit) {
       go_Right();
     } else {
@@ -367,7 +367,7 @@ void driveBot(HUSKYLENSResult result) {
       }
     } else {
       stop_Stop();
-      if (result.width > 100) {
+      if (result.width > 80) {
         auto_Stopping();
       }
     }
