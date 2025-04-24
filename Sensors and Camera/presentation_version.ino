@@ -17,10 +17,10 @@
 #define Echo_PIN_2 5   // Right ultrasonic sensor
 #define Trig_PIN_2 13  // Right ultrasonic sensor
 
-#define BUZZER_PIN 8 
+#define BUZZER_PIN 8
 
-#define FAST_SPEED 150  
-#define SPEED 100       
+#define FAST_SPEED 150
+#define SPEED 100
 #define SLOW_SPEED1 90
 #define SLOW_SPEED2 90
 
@@ -31,9 +31,9 @@
 #define BACK_SPEED1 120
 #define BACK_SPEED2 120
 
-const int distancelimit = 30;
+const int distancelimit = 5;
 
-const unsigned long AUTO_LEARN_DELAY = 15000;     // 15 seconds delay
+const unsigned long AUTO_LEARN_DELAY = 15000;    // 15 seconds delay
 const unsigned long TARGET_LOST_TIMEOUT = 5000;  // 15 seconds timeout for target loss
 
 // State tracking variables
@@ -41,7 +41,7 @@ bool learningAttempted = false;  // Flag to track if learning has been attempted
 bool relearningStarted = true;
 unsigned long startTime;
 unsigned long lastDetectionTime;  // Time when object was last detected
-bool targetLost = false;              // Flag to indicate if target is lost
+bool targetLost = false;          // Flag to indicate if target is lost
 
 // Buzzer variables
 const long beepInterval = 1000;
@@ -241,7 +241,7 @@ void go_Advance() {
 
 void go_Slow() {
   Serial.println("SLOW DOWN");
-  set_Motorspeed(85,60);
+  set_Motorspeed(85, 60);
 
   digitalWrite(RightDirectPin1, HIGH);
   digitalWrite(RightDirectPin2, LOW);
@@ -251,20 +251,20 @@ void go_Slow() {
 
 void go_Left() {
   Serial.println("TURN LEFT");
-  set_Motorspeed(80,80);
+  set_Motorspeed(80, 80);
 
   digitalWrite(RightDirectPin1, HIGH);
   digitalWrite(RightDirectPin2, LOW);
-  //digitalWrite(LeftDirectPin1, LOW);
-  //digitalWrite(LeftDirectPin2, HIGH);
+  digitalWrite(LeftDirectPin1, LOW);  //Left wheels are off
+  digitalWrite(LeftDirectPin2, LOW);
 }
 
 void go_Right() {
   Serial.println("TURN RIGHT");
-  set_Motorspeed(100,100);
+  set_Motorspeed(100, 100);
 
-  //digitalWrite(RightDirectPin1, LOW);
-  //digitalWrite(RightDirectPin2, HIGH);
+  digitalWrite(RightDirectPin1, LOW);  //Right wheels are off
+  digitalWrite(RightDirectPin2, LOW);
   digitalWrite(LeftDirectPin1, HIGH);
   digitalWrite(LeftDirectPin2, LOW);
 }
@@ -331,7 +331,7 @@ void watch(int &echo_distance_1, int &echo_distance_2) {
 void driveBot(HUSKYLENSResult result) {
   int echo_distance_1, echo_distance_2;
   watch(echo_distance_1, echo_distance_2);
-//120, 180
+
   if (result.xCenter <= 120) {
     if (echo_distance_1 > distancelimit) {
       go_Left();
@@ -345,25 +345,25 @@ void driveBot(HUSKYLENSResult result) {
       go_Left();
     }
   } else {
-    if (result.width < 35) {  //Tracked Object's block becomes smaller as it moves forward. 45
-      if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit) {
+    if (result.width <= 35) {
+      if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit) {
+        auto_Stopping();
+      } else if (echo_distance_1 < distancelimit || result.xCenter >= 180) {
+        go_Right();
+      } else if (echo_distance_2 < distancelimit || result.xCenter <= 120) {
+        go_Left();
+      } else if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit && result.xCenter > 120 && result.xCenter < 180) {
         go_Advance();
-      } else if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit) {
-        auto_Stopping();
-      } else if (echo_distance_1 < distancelimit) {
-        go_Right();
-      } else if (echo_distance_2 < distancelimit) {
-        go_Left();
       }
-    } else if (result.width <= 50) {  // Slow down instead of stopping 
-      if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit) {
-        go_Slow();
-      } else if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit) {
+    } else if (result.width <= 50) {
+      if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit) {
         auto_Stopping();
-      } else if (echo_distance_1 < distancelimit) {
+      } else if (echo_distance_1 < distancelimit || result.xCenter >= 180) {
         go_Right();
-      } else if (echo_distance_2 < distancelimit) {
+      } else if (echo_distance_2 < distancelimit || result.xCenter <= 120) {
         go_Left();
+      } else if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit && result.xCenter > 120 && result.xCenter < 180) {
+        go_Slow();
       }
     } else {
       stop_Stop();
