@@ -31,7 +31,7 @@
 #define BACK_SPEED1 120
 #define BACK_SPEED2 120
 
-const int distancelimit = 5;
+const int distancelimit = 30;
 
 const unsigned long AUTO_LEARN_DELAY = 15000;    // 15 seconds delay
 const unsigned long TARGET_LOST_TIMEOUT = 5000;  // 15 seconds timeout for target loss
@@ -241,7 +241,7 @@ void go_Advance() {
 
 void go_Slow() {
   Serial.println("SLOW DOWN");
-  set_Motorspeed(85, 60);
+  set_Motorspeed(100, 80); //85,60
 
   digitalWrite(RightDirectPin1, HIGH);
   digitalWrite(RightDirectPin2, LOW);
@@ -251,19 +251,19 @@ void go_Slow() {
 
 void go_Left() {
   Serial.println("TURN LEFT");
-  set_Motorspeed(80, 80);
+  set_Motorspeed(50, 75);
 
   digitalWrite(RightDirectPin1, HIGH);
   digitalWrite(RightDirectPin2, LOW);
-  digitalWrite(LeftDirectPin1, LOW);  //Left wheels are off
+  digitalWrite(LeftDirectPin1, HIGH);
   digitalWrite(LeftDirectPin2, LOW);
 }
 
 void go_Right() {
   Serial.println("TURN RIGHT");
-  set_Motorspeed(100, 100);
+  set_Motorspeed(85, 30);
 
-  digitalWrite(RightDirectPin1, LOW);  //Right wheels are off
+  digitalWrite(RightDirectPin1, HIGH);
   digitalWrite(RightDirectPin2, LOW);
   digitalWrite(LeftDirectPin1, HIGH);
   digitalWrite(LeftDirectPin2, LOW);
@@ -271,7 +271,7 @@ void go_Right() {
 
 void go_Back() {
   Serial.println("REVERSING");
-  set_Motorspeed(85, 60);
+  set_Motorspeed(100, 80);
 
   digitalWrite(RightDirectPin1, LOW);
   digitalWrite(RightDirectPin2, HIGH);
@@ -348,19 +348,19 @@ void driveBot(HUSKYLENSResult result) {
     if (result.width <= 35) {
       if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit) {
         auto_Stopping();
-      } else if (echo_distance_1 < distancelimit || result.xCenter >= 180) {
+      } else if (echo_distance_1 < distancelimit || result.xCenter >= 200) {
         go_Right();
-      } else if (echo_distance_2 < distancelimit || result.xCenter <= 120) {
+      } else if (echo_distance_2 < distancelimit || result.xCenter <= 100) {
         go_Left();
-      } else if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit && result.xCenter > 120 && result.xCenter < 180) {
+      } else if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit && result.xCenter >= 100 && result.xCenter <= 200) {
         go_Advance();
       }
     } else if (result.width <= 50) {
       if (echo_distance_1 < distancelimit && echo_distance_2 < distancelimit) {
         auto_Stopping();
-      } else if (echo_distance_1 < distancelimit || result.xCenter >= 180) {
+      } else if (echo_distance_1 < distancelimit || result.xCenter >= 200) { //180
         go_Right();
-      } else if (echo_distance_2 < distancelimit || result.xCenter <= 120) {
+      } else if (echo_distance_2 < distancelimit || result.xCenter <= 100) { //120
         go_Left();
       } else if (echo_distance_1 > distancelimit && echo_distance_2 > distancelimit && result.xCenter > 120 && result.xCenter < 180) {
         go_Slow();
